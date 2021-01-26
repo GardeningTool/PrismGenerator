@@ -21,3 +21,8 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# IntelliJ Generated files / useless things that don't need to be pushed to the git
+target/
+.idea/
+*.xml
