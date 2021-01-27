@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class GenerateCommand extends Command {
 
@@ -16,7 +18,7 @@ public class GenerateCommand extends Command {
     private final Message SYNTAX_MESSAGE = MessageUtil.formattedMessage(MessageUtil.RED, "Syntax error!", null, "Invalid syntax! Try ?generate (account type)");
     private final Message NO_ACCESS_MESSAGE = MessageUtil.formattedMessage(MessageUtil.RED, "No permission!", null, "You don't have permission to generate accounts!");
     private final Message NO_STOCK_MESSAGE = MessageUtil.formattedMessage(MessageUtil.RED, "No stock!", null, "There appears to be no stock! Try again later!");
-    private final String ACCOUNT_GENERATED_MESSAGE = "Your generated account is **%s**.\n You have to wait **30 seconds** to generate a new account.";
+    private final String ACCOUNT_GENERATED_MESSAGE = "Your generated account is **%s**.\n You have to wait **30 seconds** to generate a new account.\nThe message will also self-delete in 30 seconds.";
 
     public GenerateCommand() {
         super("generate");
@@ -40,7 +42,15 @@ public class GenerateCommand extends Command {
         try {
             AccountStock.Stock accountType = AccountStock.Stock.valueOf(args[1].toUpperCase());
             try {
-                executor.openPrivateChannel().complete().sendMessage(MessageUtil.formattedMessage(MessageUtil.GREEN, null, null, String.format(ACCOUNT_GENERATED_MESSAGE, AccountStock.getInstance().getAccount(accountType)))).submit();
+                CompletableFuture<Message> completableFuture = executor.openPrivateChannel().complete().sendMessage(MessageUtil.formattedMessage(MessageUtil.GREEN, null, null, String.format(ACCOUNT_GENERATED_MESSAGE, AccountStock.getInstance().getAccount(accountType)))).submit();
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(30000L);
+                        completableFuture.get().delete().submit();
+                    } catch (InterruptedException | ExecutionException exc) {
+                        exc.printStackTrace();
+                    }
+                }).start();
             } catch (IndexOutOfBoundsException exc) {
                 sendMessage(executor, textChannel, NO_STOCK_MESSAGE);
                 return;
