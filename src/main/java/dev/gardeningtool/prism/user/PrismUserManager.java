@@ -14,13 +14,16 @@ public class PrismUserManager {
 
     private static final HashMap<Long, PrismUser> prismUsers = new HashMap<>();
 
-    static {
+    public static void init() {
         Path path = Paths.get("users/");
+        if (!path.toFile().isDirectory()) {
+            path.toFile().mkdir();
+        }
         Stream.of(path.toFile().listFiles()).forEach(file -> {
             JsonParser jsonParser = new JsonParser();
             JsonObject jsonObject = null;
             try {
-                jsonParser.parse(new FileReader(file));
+                jsonObject = (JsonObject) jsonParser.parse(new FileReader(file));
             } catch (IOException exc) {
                 exc.printStackTrace(); //shouldn't ever be thrown
             }

@@ -4,6 +4,7 @@ import dev.gardeningtool.prism.accountstock.AccountStock;
 import dev.gardeningtool.prism.command.CommandManager;
 import dev.gardeningtool.prism.event.EventBus;
 import dev.gardeningtool.prism.listener.jda.JDAListener;
+import dev.gardeningtool.prism.user.PrismUserManager;
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -28,9 +29,13 @@ public class PrismBot {
     }
 
     public PrismBot() throws LoginException {
+        PrismUserManager.init();
         this.commandManager = new CommandManager();
         this.eventBus = new EventBus(this);
         this.jda = new JDABuilder().setToken(TOKEN).setActivity(Activity.playing(ACTIVITY)).setStatus(OnlineStatus.DO_NOT_DISTURB).addEventListeners(new JDAListener(eventBus)).build();
         this.accountStock = new AccountStock();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            AccountStock.getInstance().saveAll();
+        }));
     }
 }

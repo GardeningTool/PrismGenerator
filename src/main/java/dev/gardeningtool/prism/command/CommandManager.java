@@ -1,7 +1,7 @@
 package dev.gardeningtool.prism.command;
 
 import dev.gardeningtool.prism.command.impl.AddTimeCommand;
-import dev.gardeningtool.prism.command.impl.Command;
+import dev.gardeningtool.prism.command.impl.GenerateCommand;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
@@ -14,7 +14,8 @@ public class CommandManager {
 
     public CommandManager() {
         commands = Arrays.asList(
-                new AddTimeCommand()
+                new AddTimeCommand(),
+                new GenerateCommand()
         );
     }
 
