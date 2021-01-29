@@ -11,12 +11,10 @@ import java.util.stream.Stream;
 
 public class EventBus {
 
-    private Deque<Event> eventQueue;
-    private HashMap<Listener, Class<? extends Listener>> listeners;
+    private final Deque<Event> eventQueue = new LinkedList<>();
+    private final HashMap<Listener, Class<? extends Listener>> listeners = new HashMap<>();
 
     public EventBus(PrismBot prismBot) {
-        eventQueue = new LinkedList<>();
-        listeners = new HashMap<>();
         listeners.put(new CommandListener(prismBot.getCommandManager()), CommandListener.class);
         new Thread(() -> { //There's dozens of better ways to do this
             while(true) {
@@ -38,7 +36,7 @@ public class EventBus {
                     }
                 }
                 try {
-                    Thread.sleep(35L);
+                    Thread.sleep(100L);
                 } catch (InterruptedException exc) {
                     exc.printStackTrace();
                 }
